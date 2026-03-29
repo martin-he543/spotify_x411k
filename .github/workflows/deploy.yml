@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install polars nbconvert jupyter ipywidgets pandas torch
+
+      - name: Generate Full 411k Search Index
+        run: python scripts/generate_full_index.py
+
+      - name: Convert Notebook to HTML
+        run: |
+          jupyter nbconvert --to html \
+            multimodal_v9g.ipynb \
+            --output index.html
+
+      - name: Post-process HTML with Search Engine
+        run: python scripts/post_process_html.py index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          # Limit files to prevent massive repo bloating
+          # We MUST include assets/ because it contains the 30MB index
+          exclude_assets: '.git, .github, *.parquet, *.pth, *.npy, *.png, album_jonah, archive, checkpoints_album'
+
