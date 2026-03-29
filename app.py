@@ -114,9 +114,11 @@ def load_data():
         path = prefix + path if prefix and os.path.exists(prefix + path) else path
         if not os.path.exists(path): return None
         if path.endswith('.npy'):
-            arr = np.load(path)
+            # Use mmap_mode='r' to handle massive 411k files without loading everything into RAM at once
+            arr = np.load(path, mmap_mode='r')
             if len(arr) != N: return None
-            return arr.astype(np.float32)
+            # We return as is to preserve mmap, but keep in mind some operations may copy it into RAM
+            return arr
             
         df = pl.read_parquet(path).filter(pl.col('track_id').is_in(all_track_ids))
         if col_prefix:
