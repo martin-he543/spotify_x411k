@@ -26,8 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install polars numpy pandas streamlit plotly scikit-learn
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
 
       - name: Generate stlite Lite Dataset & WebAssembly Wrapper
         run: python scripts/prep_stlite.py
