@@ -2,6 +2,8 @@
 ### It's like spotify_x5000, but with 411,000 songs instead of 5,000.
 Created by Martin He, Jonah Kastner, Ryan Chawla, Lisa Vilceanu.
 
+`multimodal_v9h.ipynb` is the most up-to-date model.
+
 ## File Structure
 ```text
 spotify_x411k/
